@@ -3,6 +3,9 @@ import json
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+DRIVER_PATH_WINDOWS = r"C:\SeleniumDrivers" # For use in Lightsail
+DRIVER_PATH_PERSONAL = '/Users/juandiegovaca/Downloads' # For personal use
+
 BARCOS = ['endemic', 'elite', 'petrel', 'oceanspray']
 
 CABINAS_FINAL = []
@@ -76,12 +79,14 @@ HEADERS = {
 """
 Gets the boat ID for every page (such as Endemic, Elite, or Oceanspray)
 """
-with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f:
+with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD', 'r') as f: # Path para Lightsail
+#with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
     data = json.load(f)
     
 BOATS_IDS_FOR_API = data
 #print(BOATS_IDS_FOR_API['oceanspray'])
     
+
 
 
 
