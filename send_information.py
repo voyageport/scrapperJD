@@ -21,8 +21,8 @@ with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Contr
 
 def update_price_and_availability(boat_id=None, cabin_type_id=None):
     
-    file_json = open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GoldenGalapagos\Requests\request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'r')
-    #file_json = open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/GoldenGalapagos/Requests/request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'r')
+    file_json = open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GoldenGalapagos\Requests\request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'r') # Path para Lightsail
+    #file_json = open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/GoldenGalapagos/Requests/request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'r') # Para uso persona;
     data = file_json.read()
     
     #print(type(data))
