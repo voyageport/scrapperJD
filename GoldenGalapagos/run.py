@@ -8,8 +8,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import sys
     # caution: path[0] is reserved for script path (or '' in REPL)
     
-sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
-#sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Personal testing path
+#sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
+sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Personal testing path
 
 import send_information
 import json
@@ -23,10 +23,10 @@ options.add_argument('--disable-extensions')
 
 no_of_tries = 0
 
-driver_path = data.DRIVER_PATH_WINDOWS
-#driver_path = data.DRIVER_PATH_PERSONAL
+#driver_path = data.DRIVER_PATH_WINDOWS # Para usar en Lightsail
+driver_path = data.DRIVER_PATH_PERSONAL
 
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install())) # Para uso personal
 
 
 def manipulate_page(driver):
@@ -75,21 +75,26 @@ except:
     
 
 for ships in range(data.TOTAL_SHIPS):
-    """
-    Gets the number of dates on each ship and stores it on list data.CRUISE_AND_DATES
-    """
-    # Código para solo un barco 
-    texto_columnas = driver.find_element(By.XPATH, '/html/body/div[1]/div/main/div/section/div/div/div[5]/div/div/div[2]/div[{}]/div[3]'.format(ships+1))
-    texto_columnas = texto_columnas.text
-    texto_columnas = texto_columnas.split(' ')
-    dates_by_cruise = 0
+    try:
+        """
+        Gets the number of dates on each ship and stores it on list data.CRUISE_AND_DATES
+        """
+        # Código para solo un barco
+        
+        texto_columnas = driver.find_element(By.XPATH, '/html/body/div[1]/div/main/div/section/div/div/div[5]/div/div/div[2]/div[{}]/div[3]'.format(ships+1))
+        texto_columnas = texto_columnas.text
+        texto_columnas = texto_columnas.split(' ')
+        dates_by_cruise = 0
+        
+        for i in range(len(texto_columnas)):
+            if texto_columnas[i] == 'Available:':
+                dates_by_cruise += 1 # Almacena el número de fechas por barco
+        
+        #cruises_and_dates.append(dates_by_cruise) # Arreglo en el que el índice es el barco y el valor es el número de días por barco
+        data.CRUISES_AND_DATES.append(dates_by_cruise)
     
-    for i in range(len(texto_columnas)):
-        if texto_columnas[i] == 'Available:':
-            dates_by_cruise += 1 # Almacena el número de fechas por barco
-    
-    #cruises_and_dates.append(dates_by_cruise) # Arreglo en el que el índice es el barco y el valor es el número de días por barco
-    data.CRUISES_AND_DATES.append(dates_by_cruise)        
+    except:
+        data.TOTAL_SHIPS -= 1
 
     
 lower_limit_dates = 0 # Allows for data to be stored by ship
@@ -135,9 +140,10 @@ print('\n*** Changing json file format\n')
 final_json = scrapper.change_json_format(data) # Changes the format of the json file to the one that can be sent to the API
 final_json = json.loads(final_json)
 
+print(final_json)
 
-print('\n*** Sending info to API\n')
-send_information.send_information(final_json) # Sends the information to the API
+#print('\n*** Sending info to API\n')
+#send_information.send_information(final_json) # Sends the information to the API
 
 print('\n\nProcess finished succesfully')
 
