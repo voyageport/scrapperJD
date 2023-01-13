@@ -142,8 +142,8 @@ final_json = json.loads(final_json)
 
 print(final_json)
 
-#print('\n*** Sending info to API\n')
-#send_information.send_information(final_json) # Sends the information to the API
+print('\n*** Sending info to API\n')
+send_information.send_information(final_json) # Sends the information to the API
 
 print('\n\nProcess finished succesfully')
 
