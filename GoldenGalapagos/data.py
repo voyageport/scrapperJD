@@ -79,7 +79,7 @@ HEADERS = {
 """
 Gets the boat ID for every page (such as Endemic, Elite, or Oceanspray)
 """
-with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD', 'r') as f: # Path para Lightsail
+with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as f: # Path para Lightsail
 #with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
     data = json.load(f)
     
