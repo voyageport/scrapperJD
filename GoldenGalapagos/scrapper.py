@@ -209,13 +209,15 @@ def get_cabin_id_from_api(dict_nombre_cabina):
     'number': '{}'.format(cabin_number)}
     
     response = requests.request("POST", data.URL_API, auth=HTTPBasicAuth('user@voyageport.com', 'userVoy#1534'), headers = data.HEADERS, data=payload, files = data.FILES)
-    
+    print('*** Response: ', response.status_code)
+    """
     cabin_id = response.text
     cabin_id = cabin_id.split('"id":')
     cabin_id = cabin_id[1].split(',')
     cabin_id = int(cabin_id[0])
 
     return boat_api_number, cabin_id
+    """
 
         
       
