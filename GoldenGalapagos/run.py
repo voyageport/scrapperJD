@@ -34,7 +34,7 @@ def manipulate_page(driver):
     driver.maximize_window()
     print('Scraping for Golden Galapagos starts')
     
-    time.sleep(15)
+    time.sleep(30)
     '''    
     # Click on End Date
     scrapper.click_on_element_by_path(driver, data.END_DATE_PATH)
