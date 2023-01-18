@@ -32,6 +32,25 @@ def take_all_info(driver, path):
         .until(EC.element_to_be_clickable((By.XPATH,
                                            '{}'.format(path))))
 
+def get_specific_year(complete_title):
+    year_only = complete_title.split(' Itinerary')
+    year_only = year_only[0]
+    year_only = year_only.split(' ')
+    year_only = year_only[5]
+    
+    
+    
+    
+    '''
+    if 'December' in year_only[1] and 'January' in year_only[4]:
+        """
+        Only takes action if a cruise departs in December and arrives in January 
+        """
+        data.FLAG = False
+    
+    return year_only
+    '''
+    
 
 def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_number):
     """
@@ -52,6 +71,11 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
         dict_fecha_completa = {}
         date_complete_title = get_date_label_title(date)
         
+        
+        #print('*** Fecha completa: ', date_complete_title)
+
+        
+        
         for j in range(len(date)):
             if date[j] in days:
                 dates_temp = date[j] + ' ' + date[j + 1]
@@ -67,8 +91,21 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
         if total_available == 0:
             
             dict_departures = {} # Diccionario de información de 'departures'
+            
+            
+            
+            
+            
+            data.TEMP_YEAR = get_specific_year(date_complete_title)
             dict_departures['departure_date'] = convert_dates(dates_total[0])
             dict_departures['arrival_date'] = convert_dates(dates_total[1])
+            
+            
+            #print('departure: ', dict_departures['departure_date'])
+            #print('arrival: ', dict_departures['arrival_date'])
+            
+            
+            
             dict_departures['days'] = dates_difference(dates_total[0], dates_total[1])
             
             dict_nombre_cabina = {}
@@ -81,6 +118,10 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
             
             dict_departures['available'] = data.AVAILABILITIES_FINAL[0]
             data.AVAILABILITIES_FINAL.pop(0)
+            
+            dict_departures['hold'] = 0
+            dict_departures['promotion_name'] = data.PROMOS_FINAL.pop(0)
+            
             dict_nombre_cabina['departures'] = [dict_departures]
         else: 
             while availability_acumulada < total_available:
@@ -89,8 +130,22 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
                 """
                 
                 dict_departures = {} # Diccionario de información de 'departures'
+                
+                
+                
+                
+                
+                data.TEMP_YEAR = get_specific_year(date_complete_title)                
                 dict_departures['departure_date'] = convert_dates(dates_total[0])
                 dict_departures['arrival_date'] = convert_dates(dates_total[1])
+                
+                
+                #print('departure: ', dict_departures['departure_date'])
+                #print('arrival: ', dict_departures['arrival_date'])
+                
+                
+                
+                
                 dict_departures['days'] = dates_difference(dates_total[0], dates_total[1])
                 
                 dict_nombre_cabina = {}
@@ -103,15 +158,29 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
 
                 dict_departures['available'] = data.AVAILABILITIES_FINAL[0]
                 availability_acumulada += data.AVAILABILITIES_FINAL.pop(0)
-                
-                """
-                ***** Aquí se pone el Hold?
-                """
+
                 
                 dict_departures['hold'] = 0
                 
+                if data.PROMOS_FINAL[0] == 'Sí hay':
+                    #print(data.PROMOS_FINAL.pop(0))
+                    print('Error in:')
+                    print('   departure: ', dict_departures['departure_date'])
+                    print('   arrival: ', dict_departures['arrival_date'])
+                
+                elif data.PROMOS_FINAL[0] != '':
+                    dict_departures['promotion_type'] = 'promotion'
+                    dict_departures['promotion_name'] = data.PROMOS_FINAL.pop(0)
+               
+             
+                else:
+                    data.PROMOS_FINAL.pop(0)
+                
+                
+                
+                
                 #GET INFO FROM API
-                dict_nombre_cabina['API_BOAT_ID'], dict_nombre_cabina['API_CABIN_ID'] = get_cabin_id_from_api(dict_nombre_cabina)
+                dict_nombre_cabina['API_BOAT_ID'], dict_nombre_cabina['API_CABIN_ID'] = get_cabin_id_from_api_2(dict_nombre_cabina)
                 
                 dict_nombre_cabina['departures'] = [dict_departures]
                 dict_fecha_completa['{}'.format(dict_nombre_cabina['cabin_type'])] = dict_nombre_cabina
@@ -122,12 +191,12 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
         #print(dict_fecha_completa)
         
             data.COMPLETE_JSON[ship_name_by_number(ship_number)][date_complete_title] = dict_fecha_completa
+            
+            data.FLAG_YEAR_TO_USE == True
         
         #print(dict_with_complete_date)
         
-        
-   
-def process_cabins_and_availabilities(cabinas, availabilities):
+def process_cabins_and_availabilities(cabinas, availabilities, lista_cabin_cards):
     while len(cabinas) > 0:
         texto = cabinas[0].get_attribute('innerHTML')
         cabinas.pop(0)
@@ -153,12 +222,57 @@ def process_cabins_and_availabilities(cabinas, availabilities):
         data.AVAILABILITIES_FINAL.append(availability)
         availabilities.pop(0)
         
+        
+        if ('10% off' or '10% Off') in lista_cabin_cards[0].get_attribute('innerHTML'):
+            #print('10% off')
+            data.PROMOS_FINAL.append('10% off')
+            lista_cabin_cards.pop(0)
+        elif 'Early Bird' in lista_cabin_cards[0].get_attribute('innerHTML'):
+            #print('Early Bird')
+            data.PROMOS_FINAL.append('Early Bird')
+            lista_cabin_cards.pop(0)
+        elif 'Thanksgiving' in lista_cabin_cards[0].get_attribute('innerHTML'):
+            #print('Thanksgiving')
+            data.PROMOS_FINAL.append('Thanksgiving departure, CHARTER ONLY')
+            lista_cabin_cards.pop(0)
+        elif 'Promotion:' in lista_cabin_cards[0].get_attribute('innerHTML'):
+            """
+            If new promotion appears, it should be revised.
+            """
+            #print('Sí hay:\n', lista_cabin_cards[0].get_attribute('innerHTML'))
+            data.PROMOS_FINAL.append('10% Off')
+            lista_cabin_cards.pop(0)
+            
+        else:
+            #print('Ninguna')
+            data.PROMOS_FINAL.append('')
+            lista_cabin_cards.pop(0)
+                    
+        
 
 def convert_dates(date):
-    date += ' 2023'
-    converted_date = datetime.strptime(date, '%A, %d-%B %Y')
-    converted_date = converted_date.strftime('%Y-%m-%d')
-    return converted_date
+    #date += ' 2023'
+    
+    if data.FLAG == False:
+        if data.FLAG_YEAR_TO_USE == 0:
+            date = date + ' ' + str(data.TEMP_YEAR - 1)
+            data.FLAG_YEAR_TO_USE = 1
+        else:
+            date = date + ' ' + str(data.TEMP_YEAR)
+            data.FLAG_YEAR_TO_USE = 0
+            
+            
+        converted_date = datetime.strptime(date, '%A, %d-%B %Y')
+        converted_date = converted_date.strftime('%Y-%m-%d')
+        return converted_date
+    
+    else:
+        date = date + ' ' + str(data.TEMP_YEAR)
+        
+        converted_date = datetime.strptime(date, '%A, %d-%B %Y')
+        converted_date = converted_date.strftime('%Y-%m-%d')
+        return converted_date
+        
 
 def dates_difference(date1, date2):
     converted_date1 = datetime.strptime(date1, '%A, %d-%B')
@@ -169,6 +283,7 @@ def dates_difference(date1, date2):
     
     return int(dates_difference[0]) + 1
 
+
 def ship_name_by_number(ship):
     if ship == 0:
         return 'endemic'
@@ -178,6 +293,7 @@ def ship_name_by_number(ship):
         return 'petrel'
     else:
         return 'oceanspray'
+ 
     
 def get_date_label_title(date_to_process):
     """
@@ -196,8 +312,8 @@ def get_date_label_title(date_to_process):
             numero = numero.split('</strong>')
             title = title + ' Total Available: ' + numero[1]
     return title
-        
-        
+
+
 def get_cabin_id_from_api(dict_nombre_cabina):
 
     boat_name = dict_nombre_cabina['boat']
@@ -205,6 +321,7 @@ def get_cabin_id_from_api(dict_nombre_cabina):
     cabin_number = dict_nombre_cabina['cabin_number']
 
     
+    print('Boat: {}\t\tCabina: {}'.format(boat_api_number, cabin_number))
     payload={'boat_id': '{}'.format(boat_api_number),
     'number': '{}'.format(cabin_number)}
     
@@ -212,13 +329,11 @@ def get_cabin_id_from_api(dict_nombre_cabina):
 
     cabin_id = response.text
     cabin_id = cabin_id.split('"id":')
-    cabin_id = cabin_id[1].split(',')
+    cabin_id = cabin_id[1]
+    cabin_id = cabin_id.split(',')
     cabin_id = int(cabin_id[0])
-    print('*** Acá: ', cabin_id)
     return boat_api_number, cabin_id
 
-
-        
       
 def get_ship_number_from_api(ship_name):
     ship_name = ship_name.capitalize()    
@@ -316,10 +431,19 @@ def change_json_format(data):
     return json_object
             
     
+
+def get_cabin_id_from_api_2(dict_nombre_cabina):
+
+    boat_name = dict_nombre_cabina['boat']
+    boat_api_number = get_ship_number_from_api(boat_name)
+    cabin_number = dict_nombre_cabina['cabin_number']
+
+    #print('Boat: {}\t\tCabina: {}'.format(boat_api_number, cabin_number))
     
-    
-            
-            
+    cabin_id = int(data.CABIN_IDS_INTERNAL[str(boat_api_number)][str(cabin_number)])
+    #print(cabin_id)
+
+    return boat_api_number, cabin_id
     
     
     
