@@ -3,6 +3,20 @@ import json
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
+
+def add_years():
+    """Return a date that's `years` years after the date (or datetime)
+    object `d`. Return the same calendar date (month and day) in the
+    destination year, if it exists, otherwise use the following day
+    (thus changing February 29 to March 1).
+
+    """
+    
+    new_year = date.today().year + 1
+    return new_year
+
+
+
 DRIVER_PATH_WINDOWS = r"C:\SeleniumDrivers" # For use in Lightsail
 DRIVER_PATH_PERSONAL = '/Users/juandiegovaca/Downloads' # For personal use
 
@@ -13,6 +27,8 @@ CABINAS_FINAL = []
 NOMBRE_CABINAS = []
 
 AVAILABILITIES_FINAL = []
+
+PROMOS_FINAL = []
 
 COMPLETE_JSON = {}
 
@@ -40,10 +56,12 @@ CRUISES_AND_DATES = [0]
 
 END_DATE_PATH = '/html/body/div[1]/div/main/div/section/div/div/div[2]/div/div/div/div/div[7]/div/form/div/fieldset/div/div[2]/input'
 
+YEAR_CLASS_NAME = 'ui-datepicker-year'
+YEAR_SELECTION_PATH = '/html/body/div[9]/div/div/select[2]/option[{}]'.format(add_years() - 2012)
+
+
 MONTH_CLASS_NAME = 'ui-datepicker-month'
-
 MONTH_PATH ='/html/body/div[9]/div/div/select[1]'
-
 MONTH_SELECTION_PATH = '/html/body/div[9]/div/div/select[1]/option[{}]'.format(month_determinator())
 
 
@@ -79,13 +97,22 @@ HEADERS = {
 """
 Gets the boat ID for every page (such as Endemic, Elite, or Oceanspray)
 """
-with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as f: # Path para Lightsail
-#with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
+#with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as f: # Path para Lightsail
+with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
     data = json.load(f)
     
+
 BOATS_IDS_FOR_API = data
 #print(BOATS_IDS_FOR_API['oceanspray'])
-    
+
+
+TEMP_YEAR = 0
+
+TEMP_PREV_YEAR = 2023
+
+
+FLAG = True # Flag that keeps track if there is a ship on a year-change (departure in December and arrival in January)
+FLAG_YEAR_TO_USE = 0
 
 
 
@@ -93,14 +120,10 @@ BOATS_IDS_FOR_API = data
 
 
 
+with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/GoldenGalapagos/cabin_types_internal.json', 'r') as f: # Path para uso personal
+    data2 = json.load(f)
 
-
-
-
-
-
-
-
+CABIN_IDS_INTERNAL = data2
 
 
 
