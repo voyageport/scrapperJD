@@ -8,8 +8,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import sys
     # caution: path[0] is reserved for script path (or '' in REPL)
     
-#sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
-sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Personal testing path
+sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
+#sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Personal testing path
 
 import send_information
 import json
@@ -23,8 +23,8 @@ options.add_argument('--disable-extensions')
 
 no_of_tries = 0
 
-#driver_path = data.DRIVER_PATH_WINDOWS # Para usar en Lightsail
-driver_path = data.DRIVER_PATH_PERSONAL # Para uso personal
+driver_path = data.DRIVER_PATH_WINDOWS # Para usar en Lightsail
+#driver_path = data.DRIVER_PATH_PERSONAL # Para uso personal
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install())) 
 
