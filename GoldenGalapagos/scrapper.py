@@ -41,7 +41,7 @@ def get_specific_year(complete_title):
     
     
     
-    '''
+    
     if 'December' in year_only[1] and 'January' in year_only[4]:
         """
         Only takes action if a cruise departs in December and arrives in January 
@@ -49,8 +49,8 @@ def get_specific_year(complete_title):
         data.FLAG = False
     
     return year_only
-    '''
     
+
 
 def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_number):
     """
@@ -163,7 +163,7 @@ def get_data(driver, limite_inferior_fechas , limite_superior_fechas, ship_numbe
                 dict_departures['hold'] = 0
                 
                 if data.PROMOS_FINAL[0] == 'Sí hay':
-                    #print(data.PROMOS_FINAL.pop(0))
+                    #print('MUCHACHOS: ', data.PROMOS_FINAL.pop(0))
                     print('Error in:')
                     print('   departure: ', dict_departures['departure_date'])
                     print('   arrival: ', dict_departures['arrival_date'])
