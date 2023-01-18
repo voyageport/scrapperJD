@@ -69,6 +69,9 @@ DAY_SELECTION_PATH = '/html/body/div[8]/table/tbody/tr[3]/td[5]/a' # Random day
 DAY_SELECTION_CLASS_NAME = 'ui-state-default'
 
 
+GUESTS_PATH = '/html/body/div[1]/div/main/div/section/div/div/div[2]/div/div/div/div/div[7]/div/form/div/fieldset/div/div[4]/select'
+GUESTS_2_PATH = '/html/body/div[1]/div/main/div/section/div/div/div[2]/div/div/div/div/div[7]/div/form/div/fieldset/div/div[4]/select/option[2]'
+
 SEARCH_BUTTON_PATH = '/html/body/div[1]/div/main/div/section/div/div/div[2]/div/div/div/div/div[7]/div/form/div/fieldset/div/div[7]/button' 
 
 AVAILABILITIES_CLASS_NAME = 'important-data'
@@ -97,8 +100,8 @@ HEADERS = {
 """
 Gets the boat ID for every page (such as Endemic, Elite, or Oceanspray)
 """
-#with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as f: # Path para Lightsail
-with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
+with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as f: # Path para Lightsail
+#with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json', 'r') as f: # Path para uso personal
     data = json.load(f)
     
 
@@ -119,8 +122,8 @@ FLAG_YEAR_TO_USE = 0
 
 
 
-
-with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/GoldenGalapagos/cabin_types_internal.json', 'r') as f: # Path para uso personal
+with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GoldenGalapagos\cabin_types_internal.json', 'r') as f: # Path para Lightsail
+#with open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/GoldenGalapagos/cabin_types_internal.json', 'r') as f: # Path para uso personal
     data2 = json.load(f)
 
 CABIN_IDS_INTERNAL = data2
