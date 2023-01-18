@@ -23,46 +23,69 @@ options.add_argument('--disable-extensions')
 
 no_of_tries = 0
 
-driver_path = data.DRIVER_PATH_WINDOWS # Para usar en Lightsail
-#driver_path = data.DRIVER_PATH_PERSONAL # Para uso personal
+#driver_path = data.DRIVER_PATH_WINDOWS # Para usar en Lightsail
+driver_path = data.DRIVER_PATH_PERSONAL # Para uso personal
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install())) 
 
 
 def manipulate_page(driver):
+    
     driver.get(data.URL)
     driver.maximize_window()
     print('Scraping for Golden Galapagos starts')
     
     time.sleep(30)
-    '''    
+    
     # Click on End Date
     scrapper.click_on_element_by_path(driver, data.END_DATE_PATH)
     print('Setting date filters...')
+    time.sleep(3)
     
+    # Click on Year
+    scrapper.click_on_element_by_class_name(driver, data.YEAR_CLASS_NAME)
+    
+    #Clck on specific year (+2)
+    scrapper.click_on_element_by_path(driver, data.YEAR_SELECTION_PATH)
+    print('   Year selected')
+    
+    # Click on first day of month
+    scrapper.click_on_element_by_class_name(driver, data.DAY_SELECTION_CLASS_NAME)
+    print('   Day selected')
+    
+    """
     # Click on Month
     scrapper.click_on_element_by_class_name(driver, data.MONTH_CLASS_NAME)
     
     # Click on specific month (+6 months)
     scrapper.click_on_element_by_path(driver, data.MONTH_SELECTION_PATH)
     print('   Month selected')
-    
-    # Click on first day of month
-    scrapper.click_on_element_by_class_name(driver, data.DAY_SELECTION_CLASS_NAME)
-    print('   Day selected')
+
+    """    
     
     # Click 'Search' button
     scrapper.click_on_element_by_path(driver, data.SEARCH_BUTTON_PATH)
+    print('Searching...')
+    time.sleep(15)
+    
+    
+    """
+    Not needed
     print('Obtaining information...')
-    '''    
+
     # Grab info
     scrapper.take_all_info(driver, data.ALL_DATA_PATH)
-    
-    cabinas = driver.find_elements(By.CSS_SELECTOR, data.CABINAS_CSS_SELECTOR)  # Gets all cabins numbers and names
-    availabilities = driver.find_elements(By.CLASS_NAME, data.AVAILABILITIES_CLASS_NAME) # Gets all availabilities
-    
-    scrapper.process_cabins_and_availabilities(cabinas, availabilities) # Store cabins and availabilities in lists (or stacks)
+    """
 
+    print('Getting cabins information...')
+    cabinas = driver.find_elements(By.CSS_SELECTOR, data.CABINAS_CSS_SELECTOR)  # Gets all cabins numbers and names
+    print('Getting availabilitis information...')
+    availabilities = driver.find_elements(By.CLASS_NAME, data.AVAILABILITIES_CLASS_NAME) # Gets all availabilities
+    print('Getting promotions information...')
+    lista_cabin_cards = driver.find_elements(By.CLASS_NAME, 'cabin-card')
+
+    
+    scrapper.process_cabins_and_availabilities(cabinas, availabilities, lista_cabin_cards) # Store cabins and availabilities in lists (or stacks)
 
 try:
     manipulate_page(driver)
@@ -95,17 +118,19 @@ for ships in range(data.TOTAL_SHIPS):
     
     except:
         data.TOTAL_SHIPS -= 1
+        #data.BARCOS[2] = 'oceanspray'
 
-    
+#print('Fechas por bote: ', data.CRUISES_AND_DATES)
+
 lower_limit_dates = 0 # Allows for data to be stored by ship
 upper_limit_dates = 0
 
 #limite_inferior_fechas = 0
 #limite_superior_fechas = 0
 
-
+print('Processing data from: ')
 for k in range(data.TOTAL_SHIPS): # k is the number of ship
-    print('   Scraping information from {}'.format(data.BARCOS[k]))
+    print('   {}'.format(data.BARCOS[k]))
     #time.sleep(5) For better visualization
     """
     Cabins and availabilities are separated by the number of dates on each ship
@@ -115,20 +140,17 @@ for k in range(data.TOTAL_SHIPS): # k is the number of ship
     scrapper.get_data(driver, lower_limit_dates, upper_limit_dates, k)
     
 
-
+#print('Data promo: ', data.PROMOS_FINAL)
 
 #print(data.COMPLETE_JSON) # Print of the final json file
 
 print('\n\nScraping ended')
 
-
-
 driver.close()
 
 
-"""
-CHEQUEAR SI FUNCIONA PARA TODOS LOS BOTES
-"""
+#print(data.COMPLETE_JSON)
+
 
 scrapper.string_to_json_file(data.COMPLETE_JSON) # Creates a json file with all the data
 # process_json.string_to_json_file(data.COMPLETE_JSON) function in old directory
@@ -140,12 +162,18 @@ print('\n*** Changing json file format\n')
 final_json = scrapper.change_json_format(data) # Changes the format of the json file to the one that can be sent to the API
 final_json = json.loads(final_json)
 
-print(final_json)
+#print(final_json)
 
 print('\n*** Sending info to API\n')
 send_information.send_information(final_json) # Sends the information to the API
 
 print('\n\nProcess finished succesfully')
+
+
+
+
+
+
 
 
 
