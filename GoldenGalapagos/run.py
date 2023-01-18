@@ -36,6 +36,8 @@ def manipulate_page(driver):
     print('Scraping for Golden Galapagos starts')
     
     time.sleep(30)
+ 
+
     
     # Click on End Date
     scrapper.click_on_element_by_path(driver, data.END_DATE_PATH)
@@ -53,6 +55,7 @@ def manipulate_page(driver):
     scrapper.click_on_element_by_class_name(driver, data.DAY_SELECTION_CLASS_NAME)
     print('   Day selected')
     
+
     """
     # Click on Month
     scrapper.click_on_element_by_class_name(driver, data.MONTH_CLASS_NAME)
@@ -60,8 +63,12 @@ def manipulate_page(driver):
     # Click on specific month (+6 months)
     scrapper.click_on_element_by_path(driver, data.MONTH_SELECTION_PATH)
     print('   Month selected')
-
     """    
+    
+    # Filter for 2 passengers
+    scrapper.click_on_element_by_path(driver, data.GUESTS_PATH)
+    scrapper.click_on_element_by_path(driver, data.GUESTS_2_PATH)
+    
     
     # Click 'Search' button
     scrapper.click_on_element_by_path(driver, data.SEARCH_BUTTON_PATH)
@@ -70,12 +77,12 @@ def manipulate_page(driver):
     
     
     """
-    Not needed
     print('Obtaining information...')
 
     # Grab info
     scrapper.take_all_info(driver, data.ALL_DATA_PATH)
     """
+    
 
     print('Getting cabins information...')
     cabinas = driver.find_elements(By.CSS_SELECTOR, data.CABINAS_CSS_SELECTOR)  # Gets all cabins numbers and names
@@ -85,7 +92,10 @@ def manipulate_page(driver):
     lista_cabin_cards = driver.find_elements(By.CLASS_NAME, 'cabin-card')
 
     
+    print('Processing data...')
     scrapper.process_cabins_and_availabilities(cabinas, availabilities, lista_cabin_cards) # Store cabins and availabilities in lists (or stacks)
+
+
 
 try:
     manipulate_page(driver)
@@ -96,6 +106,7 @@ except:
     print('Try #2')
     manipulate_page(driver)
     
+
 
 for ships in range(data.TOTAL_SHIPS):
     try:
@@ -146,10 +157,14 @@ for k in range(data.TOTAL_SHIPS): # k is the number of ship
 
 print('\n\nScraping ended')
 
+
+
 driver.close()
 
 
+
 #print(data.COMPLETE_JSON)
+
 
 
 scrapper.string_to_json_file(data.COMPLETE_JSON) # Creates a json file with all the data
@@ -164,10 +179,13 @@ final_json = json.loads(final_json)
 
 #print(final_json)
 
+
 print('\n*** Sending info to API\n')
 send_information.send_information(final_json) # Sends the information to the API
 
 print('\n\nProcess finished succesfully')
+
+
 
 
 
