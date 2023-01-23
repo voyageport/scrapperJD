@@ -4,8 +4,8 @@ from requests.auth import HTTPBasicAuth
 import sys
     
 
-#sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path para Lightsail
-sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final') # Path para test personal
+sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path para Lightsail
+#sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final') # Path para test personal
 
 import API_CREDENTIALS
 
@@ -129,9 +129,6 @@ def send_information(final_json, specific_path):
     
 
 #update_price_and_availability(48, 176, 'GAdventures')
-
-
-
 #update_price_and_availability(31, 240, 'GoldenGalapagos')
 #update_price_and_availability(52, 313, 'GoGalapagos')
 
