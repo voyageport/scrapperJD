@@ -1,0 +1,16 @@
+{
+	"52" : {
+		"Standard Cabin" : 315,
+		"Standard Plus" : 314,
+		"Junior Suite" : 316,
+		"Junior Suite Plus" : 579,
+		"Balcony Suite" : 319,
+		"Legend Balcony Suite" : 313
+
+	},
+	"43" : {
+		"Standard Cabin" : 167,
+		"Standard Plus" : 168,
+		"Junior Cabin" : 171
+	}
+}
