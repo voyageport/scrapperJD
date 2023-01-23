@@ -181,9 +181,14 @@ final_json = json.loads(final_json)
 
 
 print('\n*** Sending info to API\n')
-send_information.send_information(final_json) # Sends the information to the API
+#send_information.send_information(final_json) # Sends the information to the API
+send_information.send_information_golden(final_json) # Sends the information to the API
 
 print('\n\nProcess finished succesfully')
+
+
+a = open('Register.txt', 'w')
+a.write(str(datetime.today()))
 
 
 
