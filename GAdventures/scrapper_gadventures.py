@@ -48,7 +48,8 @@ def get_data_part_2(driver):
     for i in range(len(data_gadventures.LINKS_TO_VISIT)):
         
         print('     Getting information from: ', data_gadventures.TOUR_TITLES_CRUISE_ONLY.pop(0)) # Prints the current tour that its being scrapped 
-        
+                
+
         # Get the boat ID of the curent cruise
         trip_boat_id = data_gadventures.BOATS[data_gadventures.CRUISES_TO_ADD.pop(0)]
         
@@ -57,7 +58,19 @@ def get_data_part_2(driver):
             COMPLETE_JSON[trip_boat_id] = {}
         
         driver.get(data_gadventures.LINKS_TO_VISIT[i]) # Specific tour is opened in another window
-        time.sleep(5)
+        time.sleep(10)
+
+        # Gets all the info of promotions
+        promos = driver.find_elements(By.CLASS_NAME, data_gadventures.PROMO_INFO_CLASS_NAME)
+        
+
+        for i in range(len(promos)//2): # Each promo appears twice
+            texto = promos[i].get_attribute('innerHTML')
+            promo, start_date, end_date = get_promos_and_dates(texto)
+            
+            data_gadventures.PROMOS_PERCENTAGES.append(promo)
+            data_gadventures.PROMOS_START_DATES.append(start_date)
+            data_gadventures.PROMOS_END_DATES.append(end_date)
 
         """
         Método para sacar fechas y disponibilidades por XPATH
@@ -80,8 +93,9 @@ def get_data_part_2(driver):
             flag = check_exists_by_xpath(driver, '/html/body/div[4]/div/div[2]/div[4]/section[{}]/div[1]/div[2]/div/div[2]/div[1]/ul/div[1]/li'.format(data_gadventures.XPATH_INDEXES[index_in_use]))
 
 
-        for i in range(total_data):
-        #for i in range(36):
+        for i in range(total_data): # To iterate throguh all data
+        #for i in range(40): # To test few dates 
+        #for i in range(total_data-83): # To test promotions
 
             try:
                 """
@@ -102,7 +116,6 @@ def get_data_part_2(driver):
                 months_counter += 1
                 
     print('Scrapping process finished succesfully')
-       
 
 def click_on_element_by_path(driver, path):
     time.sleep(5)
@@ -118,11 +131,60 @@ def click_on_element_by_class_name(driver, class_name):
                                            '{}'.format(class_name))))\
         .click()
         
-
 def remove_special_char(text: str):
 
     pattern = r'[' + string.punctuation + ']'
     return re.sub(pattern, '', text.strip())
+
+def convert_promos_dates(date_string):
+    date_formatted = datetime.strptime(date_string, '%b %d, %Y').date()
+    return date_formatted
+    
+def get_promos_and_dates(texto):
+    promo = texto
+    date = texto
+    
+    promo = promo.split('>')
+    promo = promo[2]
+    promo = promo.split('-')
+    promo = promo[0]
+    promo = promo.split('Save')
+    promo = promo[1]
+    promo = promo.strip()
+    #print('Promo: ', promo)
+    
+    date = date.split('>')
+    date = date[3]
+    date = date.split('<')
+    date = date[0] # Stores dates of start annd expiration of promotion
+    
+    year = date.split(', ') 
+    year = int(year[1].strip()) # Stores only the year, to add it to the date in which promotion starts
+    
+    start_date = date.split(' - ')
+    start_date = start_date[0]
+    end_date = date.split(' - ')
+    end_date = end_date[1]
+    
+    month_1 = start_date.split(' ')
+    month_1 = month_1[0]    
+    month_2 = end_date.split(' ')
+    month_2 = month_2[0]
+    
+    if ('Dec' in month_1 and 'Jan' in month_2) or ('Dec' in month_1 and 'Dec' not in month_2):
+        """
+        Fixes the year in case a promo goes from the 
+        end of a year to the start of another year
+        """
+        year -= 1
+    
+    start_date = start_date + ', ' + str(year) # Adds the corresponding year to the start_date
+    
+    # Dates become formatted for further validation of promotions
+    start_date = convert_promos_dates(start_date)
+    end_date = convert_promos_dates(end_date)
+    
+    return promo, start_date, end_date
 
 def get_boat_id_in_text(boat_name_text: str):
     '''
@@ -229,7 +291,6 @@ def store_trip_dates(dates):
     
     #print('*** len: ', len(data_gadventures.DATES_INFO))
     
-
 def clean_html(info):
     info = info.split('>')
     info = info[1]
@@ -267,9 +328,6 @@ def clean_tour_info(all_info, year_to_use, trip_boat_id):
                 
                 #print('Departure date: ', data_gadventures.DEPARTURE_DATE_TEMP)
                 #print('Arrival date: ', data_gadventures.ARRIVAL_DATE_TEMP)
-                
-
-
         availability_info = all_info[1]
         
         if int(clean_html(availability_info)[0]) == 7:
@@ -293,10 +351,21 @@ def clean_tour_info(all_info, year_to_use, trip_boat_id):
                 'days' : dates_difference(data_gadventures.DEPARTURE_DATE_TEMP, data_gadventures.ARRIVAL_DATE_TEMP),
                 'available' : availability_final,
                 'hold' : 0,
-                'adult_price' : price_final[1:] # Eliminates the dollar sign
+                'adult_price' : int(price_final[1:]) # Eliminates the dollar sign
             }
-        
 
+        promo = add_promos(dict_departures_temp['departure_date'])
+        
+        if promo != None:
+            dict_departures_temp['promotion_type'] = 'promotion'
+            dict_departures_temp['promotion_name'] = str(promo) + ' Off'
+        else:
+            dict_departures_temp['promotion_name'] = 'season price'
+            
+
+        #print('***** PROMOO: ', promo, end = '\n\n')
+        #print('***** ', dict_departures_temp, end = '\n\n')
+        
         if cabin_type not in COMPLETE_JSON[trip_boat_id].keys():
             COMPLETE_JSON[trip_boat_id][cabin_type] = {
                     'boat' : trip_boat_id,
@@ -306,23 +375,26 @@ def clean_tour_info(all_info, year_to_use, trip_boat_id):
         else:
             COMPLETE_JSON[trip_boat_id][cabin_type]['departures'].append(dict_departures_temp)
 
-        
+        #print('***** ', dict_departures_temp, end = '\n\n')     
     elif 'class="date "' in all_info:
-
         all_info = all_info.split('"date ">')
         all_info = all_info[1]
         all_info = all_info.split("</div>")
         
-
         convert_dates(all_info[0], year_to_use)
 
-    
-    
+def add_promos(departure_date):
+    date_formatted = datetime.strptime(departure_date, '%Y-%m-%d').date()
+    for i in range(len(data_gadventures.PROMOS_START_DATES)):
+        
+        if data_gadventures.PROMOS_START_DATES[i] <= date_formatted <= data_gadventures.PROMOS_END_DATES[i]:
+            return data_gadventures.PROMOS_PERCENTAGES[i]
+        
+    return None
+        
 def cabin_type_id_internal(trip_boat_id, cabin_type):
     return data_gadventures.CABIN_IDS_INTERNAL[str(trip_boat_id)][cabin_type]
     
-
-
 def json_creator(dict_departures_temp, availability_final, price_final, cabin_type, trip_boat_id):
     dict_departures_temp = {
             'departure_date' : data_gadventures.DEPARTURE_DATE_TEMP,
@@ -343,11 +415,6 @@ def json_creator(dict_departures_temp, availability_final, price_final, cabin_ty
     else:
         COMPLETE_JSON[trip_boat_id][cabin_type]['departures'].append(dict_departures_temp)
         
-
-
-
-
-
 def dates_difference(date1, date2):
     converted_date1 = datetime.strptime(date1, '%Y-%m-%d')
     converted_date2 = datetime.strptime(date2, '%Y-%m-%d')
@@ -356,7 +423,6 @@ def dates_difference(date1, date2):
     dates_difference = dates_difference.split(' ')
 
     return int(dates_difference[0]) + 1
-
 
 def check_exists_by_xpath(driver, xpath):
     try:
@@ -371,7 +437,6 @@ def get_year(month_and_year):
     year = int(month_and_year[1])
     return year
     
-
 def convert_dates(date, year_to_use):
     date2 = date.split(' - ')
     departure_date = date2[0]
@@ -387,7 +452,6 @@ def convert_dates(date, year_to_use):
     
     data_gadventures.DEPARTURE_DATE_TEMP = converted_date1
     data_gadventures.ARRIVAL_DATE_TEMP = converted_date2
-    
     
 def json_to_file():
     json_temp = json.dumps(COMPLETE_JSON)
