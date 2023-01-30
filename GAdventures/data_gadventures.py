@@ -11,6 +11,8 @@ MONTHS = ['January 2023', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY' 'A
 
 MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+CLOSE_COOKIES_CLASS_NAME = 'onetrust-close-btn-handler onetrust-close-btn-ui banner-close-button ot-close-icon'.replace(' ', '.')
+
 VIEW_ALL_TOURS_BUTTON_CLASS_NAME = 'heroBtn'
 
 TOURS_CONTAINER_CLASS_NAME = 'ais-Hits'
@@ -22,6 +24,12 @@ TOURS_NAMES_CLASS_NAME = 'name'
 TOUR_TITLES = []
 
 TOUR_TITLES_CRUISE_ONLY = []
+
+
+PROMO_INFO_CLASS_NAME = 'promo-alert'
+PROMOS_PERCENTAGES = []
+PROMOS_START_DATES = []
+PROMOS_END_DATES = []
 
 
 

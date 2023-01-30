@@ -23,8 +23,8 @@ import send_information
 """
 *** YA ESTÁ LISTO PARA ACTTUALIZAR DATOS EN GDS
 TO DO:
-    1. Revisar envío de precios
-    2. Incluir promociones
+    1. Armar el json incluyendo las promociones en las fechas designadas
+e    2. Revisar envío de precios (supuestamente arreglado con enviar promociones)
 """
 
 
@@ -40,6 +40,16 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 driver.get(data_gadventures.URL)
 driver.maximize_window()
 print('Scraping for G Adventures starts')
+
+
+# Click on 'X' for Cookies
+try:
+    '''
+    Only tries to click on the 'X' in case it doesn't appear
+    '''
+    scrapper_gadventures.click_on_element_by_class_name(driver, data_gadventures.CLOSE_COOKIES_CLASS_NAME)
+except:
+    time.sleep(3)
 
 # Click con 'View all Galápagos tours
 scrapper_gadventures.click_on_element_by_class_name(driver, data_gadventures.VIEW_ALL_TOURS_BUTTON_CLASS_NAME)
@@ -59,7 +69,10 @@ time.sleep(5)
 # Call to get all data from pages
 scrapper_gadventures.get_data_part_1(driver, tour_buttons)
 
-#print('\n\n*** ', data_gadventures.COMPLETE_JSON)
+print('\n\n*** ', data_gadventures.COMPLETE_JSON)
+
+
+
 
 time.sleep(2)
 print('Storing JSON to file...')
@@ -77,9 +90,12 @@ send_information.send_information(data_gadventures.COMPLETE_JSON, 'GAdventures')
 
 print('Process finished succesfully')
 
+
+
     
     
             
+    
     
     
     
