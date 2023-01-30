@@ -5,26 +5,21 @@ import requests
 import json
 import data_gogalapagos
 import data_process
+import time
 
 import sys
     # caution: path[0] is reserved for script path (or '' in REPL)
-sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
-#sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Path para uso personal
+#sys.path.insert(1, r'C:\Users\Administrator\Documents\Projects\scrapper_JD') # Path to use in Lightsail
+sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/') # Path para uso personal
 
 import send_information
 
 """
 To do:
-    1. Revisar precios
-    2. Incluir promociones
+    1. Asegurarse que en COMPLETE_JSON se estén almacenando cada fecha como diccionario y no como lista
+    2. Revisar precios
+    3. Incluir promociones
 
-Notas:
-    * Se hace request para 1 año en el futuro y se recibe solo hasta marzo 2023
-
-
-Preguntas:
-    1) ¿Qué hacer si hay promos por cabina Y promos para toda la fecha?
-    2) ¿Cómo manejar las 'extensions'?
 """
 
 
@@ -71,37 +66,56 @@ def login_to_api():
     #headers['Authorization'] = 'Bearer ' + token
     data_gogalapagos.HEADERS['Authorization'] = 'Bearer ' + data_gogalapagos.API_TOKEN
     
-def get_info_from_api():
+def get_info_from_api(from_date, until_date):
     
     complete_url = data_gogalapagos.BASE_URL + data_gogalapagos.AVAILABILITIES_TAG
     
     params = {
-        "from" : date.today(),
-        "until" : data_process.add_years(date.today(), 2), # Sets the search a year in the future # add_days(date.today(), 60)
+        "from" : from_date,
+        "until" : until_date, # Sets the search a year in the future
         "paxs" : 1
         }
 
-    print('** from sent: {}\t\tuntil sent: {}'.format(date.today(), data_process.add_years(date.today(), 1)))
+    #print('** from sent: {}\t\tuntil sent: {}'.format(from_date, until_date))
     
+
     response = requests.get(complete_url, headers = data_gogalapagos.HEADERS, params = params)
     data = response.json()
-    
-    #print(data[len(data)-1])
-    
-    return data 
  
+    return data
+
+ 
+def determine_day(i):
+    return data_process.add_months(date.today(), 1 * i), data_process.add_months(data_process.add_months(date.today(), 1 * i), 1)
+    
 
 
-
-print('Logging in to API')
+print('Logging in to GoGalapagos API...', end = '\t\t')
 login_to_api() # API Authentication
 print('Access successful')
+time.sleep(1)
 
-print('Getting info a year in advance')
-json_example = get_info_from_api() # Gets all info for time lapse
+months = 12
+print('\nGetting info {} months in advance...'.format(months))
 
-print('Processing data')
-json_object = json.dumps(json_example) # Creates object in order to save it as file
+
+for i in range(months): # Iteration is equal to the number of months that are desired
+    from_date, until_date = determine_day(i)
+    #print('from: {}\t\tuntil: {}'.format(from_date, until_date))
+
+    
+    json_example = get_info_from_api(from_date, until_date) # Gets all info for time lapse
+    for i in range(len(json_example)):
+        data_gogalapagos.COMPLETE_JSON_LIST.append(json_example[i])
+
+
+#print('*** FINAL *** ', data_gogalapagos.COMPLETE_JSON_LIST[0])
+
+
+
+
+print('Processing data...')
+json_object = json.dumps(data_gogalapagos.COMPLETE_JSON_LIST) # Creates object in order to save it as file
 
 # Saves returned info to file 
 with open("all_data.json", "w") as outfile:
@@ -112,12 +126,16 @@ outfile.close()
 # Gets the JSON file in the format for GDS
 final_json = data_process.process_info()
 
-print(final_json)
+print('Info ready to be sent to GDS...')
+time.sleep(1)
+#print(final_json)
+
 
 # Sends info to the API
-print('Sending info to API')
+print('Sending info to API...')
 send_information.send_information(final_json, 'GoGalapagos')
 
+print('\n\n*** Process finished succesfully!')
 
 
 
