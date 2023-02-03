@@ -63,15 +63,15 @@ AVAILABILITIES_PATH_GENERAL = '/html/body/div[1]/div/section/div[12]/div/div/div
 COMPLETE_JASON = {}
 
 def return_boats_data():
-    #with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as boats_fp: # Path para Lightsail
-    with open("/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json") as boats_fp:
+    with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\boats_ids.json', 'r') as boats_fp: # Path para Lightsail
+    #with open("/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/boats_ids.json") as boats_fp:
         return json.load(boats_fp)
     
 BOATS_DATA = return_boats_data()
 
 def return_cabin_ids():
-    #with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\Intrepid\internal_cabins_intrepid.json', 'r') as cabins_fp: # Path para Lightsail
-    with open("/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/Intrepid/internal_cabins_intrepid.json") as cabins_fp: # Path para uso personal
+    with open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\Intrepid\internal_cabins_intrepid.json', 'r') as cabins_fp: # Path para Lightsail
+    #with open("/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/Intrepid/internal_cabins_intrepid.json") as cabins_fp: # Path para uso personal
         return json.load(cabins_fp)
 
 CABINS_IDS_INTERNAL = return_cabin_ids()
