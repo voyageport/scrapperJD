@@ -34,7 +34,7 @@ print('Starting scraping process for Intrepid')
 
 
 driver.get(data_intrepid.URL)
-#driver.maximize_window()
+driver.maximize_window()
 print('Scraping for Intrepid starts')
 time.sleep(3)
 
