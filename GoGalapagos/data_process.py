@@ -15,11 +15,20 @@ def process_info():
     dict_ships = {}
     
     #print(data[0].keys()) # ['id', 'status', 'start_date', 'end_date', 'nights', 'duration_id', 'code', 'combination_itinerary', 'availability', 'cabin_max', 'commission', 'min_gross', 'min_net', 'promotions_cabin', 'ship', 'itinerary', 'promotion', 'languages', 'extensions', 'cabins']
-    
 
-    
     for i in range(len(data)):
     #for i in range(1): For only one boat 
+        """
+        Inclution of promotion descriptions (like round ticket)
+        """
+        if data[i]['promotion'] != None:
+            if '%' not in data[i]['promotion']['name']:
+                promotion_description = data[i]['promotion']['name']
+                #print('*** ABC: ', data[i]['promotion']['name'], end='\n\n')
+            else:
+                promotion_description = ''
+        else:
+            promotion_description = ''
 
         departure_temp = data[i]['start_date']
         departure_temp = datetime.strptime(departure_temp, '%Y-%m-%d').date()
@@ -27,7 +36,6 @@ def process_info():
         arrival_temp = data[i]['end_date']
         arrival_temp = datetime.strptime(arrival_temp, '%Y-%m-%d').date()
 
-        
         date_difference  = get_days_difference(departure_temp, arrival_temp)
 
         if  data[i]['ship']['name'] == 'Coral I & Coral II':
@@ -84,10 +92,18 @@ def process_info():
                 dict_departures_temp['adult_price'] = int(new_price)
                 dict_departures_temp['promotion_name'] = str(promotion_name)
                 
+            
+            dict_departures_temp['promotion_description'] = promotion_description
             dict_ships[boat_id][cabin_id]['departures'].append(dict_departures_temp)
 
     #print(dict_ships)    
     return dict_ships
+
+
+
+
+
+
     
     
     
