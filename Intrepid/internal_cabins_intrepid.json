@@ -1,0 +1,16 @@
+{
+	"35" : {
+		"Standard Queen" : 76,
+		"Standard Twin" : 75,
+		"Junior Balcony Suite - twin" : 71,
+		"Deluxe Balcony Suite - twin" : 582,
+		"Deluxe Balcony Suite - queen" : 78,
+		"Junior Balcony Suite - queen" : 581
+	},
+	"77" : {
+		"Lower deck twin" : 293,
+		"Lower deck double" : 365,
+		"Upper deck twin/double" : 294,
+		"Main deck suite" : 295
+	}
+}
