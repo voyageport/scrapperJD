@@ -57,37 +57,37 @@ def get_data(driver):
     Main method of the program
     """
     # To test an specific tour
-    driver.get('https://www.intrepidtravel.com/en/ecuador/classic-galapagos-central-eastern-islands-grand-queen-beatriz-136720')
+    #driver.get('https://www.intrepidtravel.com/en/ecuador/galapagos-glance-southern-islands-le-grande-daphne-125738')
     
     
     
     
     
-    """ 
+
     # Iteration through all links
     for i in range(len(data_intrepid.LINKS_TO_VISIT)):
     #for i in range(5):
         driver.get(data_intrepid.LINKS_TO_VISIT[i]) # For automatization
-    """
-    
-    
-    
-    #click_on_element_by_path(driver, data_intrepid.CLOSE_COOKIES_2_PATH) # Closes the cookies pop-up
-    try:
-        time.sleep((3))
-        click_on_element_by_class_name(driver, data_intrepid.CLOSE_COOKIES_2_CLASS_NAME) # Closes the cookies pop-up
-    except:
-        print('No cookies pop-up')
-    
-    tour_title, boat_name, boat_ID = get_tour_title_and_boat_id(driver) # Gets the tour title and the boat ID
-    include_boat_in_json(boat_ID) # Checks if boat exists in keys of JSON file and includes it
-    total_days = determine_days(driver) # Gets the number of days of duration (it subtracts the days in Quito)
-    view_more_departures(driver) # Clicks on 'View more departures' until all dates are shown
-    get_all_dates_and_cabins(driver, boat_ID, total_days) # Gets the information in all cabins (including prices)
-    json_to_file() # Stores all the info in a file
 
-    #print('Dict: ', data_intrepid.COMPLETE_JASON)
-    #driver.close()
+    
+    
+    
+        #click_on_element_by_path(driver, data_intrepid.CLOSE_COOKIES_2_PATH) # Closes the cookies pop-up
+        try:
+            time.sleep((3))
+            click_on_element_by_class_name(driver, data_intrepid.CLOSE_COOKIES_2_CLASS_NAME) # Closes the cookies pop-up
+        except:
+            print('No cookies pop-up')
+        
+        tour_title, boat_name, boat_ID = get_tour_title_and_boat_id(driver) # Gets the tour title and the boat ID
+        include_boat_in_json(boat_ID) # Checks if boat exists in keys of JSON file and includes it
+        total_days = determine_days(driver) # Gets the number of days of duration (it subtracts the days in Quito)
+        view_more_departures(driver) # Clicks on 'View more departures' until all dates are shown
+        get_all_dates_and_cabins(driver, boat_ID, total_days) # Gets the information in all cabins (including prices)
+        json_to_file() # Stores all the info in a file
+    
+        #print('Dict: ', data_intrepid.COMPLETE_JASON)
+        #driver.close()
 
 
 
@@ -231,20 +231,38 @@ def get_all_dates_and_cabins(driver, boat_ID, total_days):
                 'arrival_date' : arrival,
                 'days' : total_days,
                 'available' : None,
-                'hold' : 0,
-                'adult_price' : None,
-                'promotion_name' :'season price'
+                'hold' : 0
+                #'adult_price' : None,
+                #'promotion_name' :'season price'
                 }
             
             price = get_prices(driver, i+1, j+2)
             availability = get_availabilities(driver, i+1, j+2)
 
+            
+
+
+
+            """
             if price == 'Fully booked':
                 dict_departures_temp['adult_price'] = 0
+            elif price == 'Not able to get price':
+                
             else:
                 dict_departures_temp['adult_price'] = int(price)
               
             dict_departures_temp['available'] = availability
+            """
+            
+            try:
+                dict_departures_temp['available'] = int(availability)
+                dict_departures_temp['adult_price'] = int(price)
+                dict_departures_temp['promotion_name'] = 'season price'
+            except:
+                print('No se logró para start: {}\tend:{}'.format(dict_departures_temp['departure_date'], dict_departures_temp['arrival_date']))
+                
+            
+            
             
             
             
@@ -254,20 +272,22 @@ def get_all_dates_and_cabins(driver, boat_ID, total_days):
                 """
                 Only stores info if there is availability
                 """
-                cabin_type_name = driver.find_element(By.XPATH, data_intrepid.CABIN_TYPES_PATH_GENERAL.format(i+1, j+2)).get_attribute('innerHTML')
-                cabin_ID = get_cabin_ID_for_API(boat_ID, cabin_type_name)    
-            
-                # Inserting cabin types to JSON file
-                #print('\t\t', driver.find_element(By.XPATH, data_intrepid.CABIN_TYPES_PATH_GENERAL.format(i+1, j+2)).get_attribute('innerHTML'), end = '\t\t')
-                #print('*** ', dict_departures_temp, end = '\n\n')
-                if cabin_ID not in data_intrepid.COMPLETE_JASON[boat_ID]:
-                    data_intrepid.COMPLETE_JASON[boat_ID][cabin_ID] = {
-                        'boat' : boat_ID,
-                        'cabin' : cabin_ID,
-                        'departures' : []
-                        }
-                data_intrepid.COMPLETE_JASON[boat_ID][cabin_ID]['departures'].append(dict_departures_temp)
+                try:
+                    cabin_type_name = driver.find_element(By.XPATH, data_intrepid.CABIN_TYPES_PATH_GENERAL.format(i+1, j+2)).get_attribute('innerHTML')
+                    cabin_ID = get_cabin_ID_for_API(boat_ID, cabin_type_name)    
                 
+                    # Inserting cabin types to JSON file
+                    #print('\t\t', driver.find_element(By.XPATH, data_intrepid.CABIN_TYPES_PATH_GENERAL.format(i+1, j+2)).get_attribute('innerHTML'), end = '\t\t')
+                    #print('*** ', dict_departures_temp, end = '\n\n')
+                    if cabin_ID not in data_intrepid.COMPLETE_JASON[boat_ID]:
+                        data_intrepid.COMPLETE_JASON[boat_ID][cabin_ID] = {
+                            'boat' : boat_ID,
+                            'cabin' : cabin_ID,
+                            'departures' : []
+                            }
+                    data_intrepid.COMPLETE_JASON[boat_ID][cabin_ID]['departures'].append(dict_departures_temp)
+                except:
+                    pass
                 
                 
                 
@@ -294,45 +314,52 @@ def format_dates(date, date_indicator):
     return str(date_modified.date())
     
 def get_prices(driver, i, j):
-    price = driver.find_element(By.XPATH, data_intrepid.PRICES_PATH_GENERAL.format(i, j)).get_attribute('innerHTML')
-    if'Fully booked' in price:
-        return 'Fully booked'
-    else:
-        if '"room.discount_price">' in price:
-            price = price.split('"room.discount_price">')
-            price = price[1]
-            price = price.split('<')
-            price = price[0]
-            price = price[1:]
-            if ',' in price:
-                price = price.replace(',', '')
-            return int(price)
-        elif '"room.total_price">' in price:
-            price = price.split('"room.total_price">')
-            price = price[1]
-            price = price.split('<')
-            price = price[0]
-            price = price[1:]
-            if ',' in price:
-                price = price.replace(',', '')
-            return int(price)
+    try:
+        price = driver.find_element(By.XPATH, data_intrepid.PRICES_PATH_GENERAL.format(i, j)).get_attribute('innerHTML')
+        if'Fully booked' in price:
+            return 'Fully booked'
         else:
-            return 'Not able to get price'
+            if '"room.discount_price">' in price:
+                price = price.split('"room.discount_price">')
+                price = price[1]
+                price = price.split('<')
+                price = price[0]
+                price = price[1:]
+                if ',' in price:
+                    price = price.replace(',', '')
+                return int(price)
+            elif '"room.total_price">' in price:
+                price = price.split('"room.total_price">')
+                price = price[1]
+                price = price.split('<')
+                price = price[0]
+                price = price[1:]
+                if ',' in price:
+                    price = price.replace(',', '')
+                return int(price)
+            else:
+                print('\n\n****:{}\n\n'.format(price))
+                return 'Not able to get price'
+    except:
+        return 'Not able to get price'
         
 def get_availabilities(driver, i, j):
-    availability = driver.find_element(By.XPATH, data_intrepid.AVAILABILITIES_PATH_GENERAL.format(i, j)).get_attribute('innerHTML')
-    #print(availability)
-    if 'left' in availability:
-        availability = availability.split('>')
-        availability = availability[-3]
-        availability = availability.split(' ')
-        availability = availability[0]
+    try:
+        availability = driver.find_element(By.XPATH, data_intrepid.AVAILABILITIES_PATH_GENERAL.format(i, j)).get_attribute('innerHTML')
         #print(availability)
-        return int(availability)
-    elif 'book-now' in availability:
-        return 4
-    else:
-        #print(0)
+        if 'left' in availability:
+            availability = availability.split('>')
+            availability = availability[-3]
+            availability = availability.split(' ')
+            availability = availability[0]
+            #print(availability)
+            return int(availability)
+        elif 'book-now' in availability:
+            return 4
+        else:
+            #print(0)
+            return 0
+    except:
         return 0
 
 def json_to_file():
