@@ -75,7 +75,7 @@ def send_information_golden(final_json):
 #update_price_and_availability(31,240)
 
 
-def update_price_and_availability(boat_id=None, cabin_type_id=None, specific_path=''):
+def update_price_and_availability(boat_id=None, cabin_type_id=None, specific_path='', GDS_indicator=''):
     print('En update price: ', specific_path)
 
     #file_json = open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GoldenGalapagos\Requests\request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'r') # Código para Lightsail
@@ -93,10 +93,21 @@ def update_price_and_availability(boat_id=None, cabin_type_id=None, specific_pat
     '''
     #list_string = json.dumps(data['departures'])
     #data['departures'] = list_string
-
     
-    url = '{}{}'.format(API_CREDENTIALS.API_URL_REAL, API_CREDENTIALS.UPDATE_PRICE_AND_AVAILABILITY_PATH)
-    print('Enviando a : ', url)
+    if GDS_indicator == True:
+        print('True`')
+        GDS_URL = API_CREDENTIALS.API_URL_REAL
+    elif GDS_indicator == False:
+        print('False')
+        GDS_URL = API_CREDENTIALS.API_URL
+    else:
+        GDS_URL = None
+        print('Not able to decide GDS URL')
+    
+    # Sends info to Demo GDS
+    url = '{}{}'.format(GDS_URL, API_CREDENTIALS.UPDATE_PRICE_AND_AVAILABILITY_PATH) # Sends info to demo GDS
+    
+    print('\tEnviando a : ', url)
     
     response = requests.post(url, json=data,
                              auth=HTTPBasicAuth(API_CREDENTIALS.API_USER, API_CREDENTIALS.API_PASS),
@@ -107,9 +118,13 @@ def update_price_and_availability(boat_id=None, cabin_type_id=None, specific_pat
     print(f"\tStatus code of response: {response.status_code}\n")
 
 
-def send_information(final_json, specific_path):
+
+def send_information(final_json, specific_path, GDS_indicator):
     #print('En send information: ', specific_path)
     #print(final_json) 
+    # GDS indicator:
+        # True: live server
+        # False: Demo GDS
     for boat_id in final_json:
         for cabin_type_id in final_json[boat_id]:
 
@@ -128,27 +143,27 @@ def send_information(final_json, specific_path):
             
             ##print(info_in_json, end = '\n\n*\n\n')
             
-            f = open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GAdventures\Requests\request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'w') # Path to use in Lightsail 
+            #f = open(r'C:\Users\Administrator\Documents\Projects\scrapper_JD\GAdventures\Requests\request_boat_{}_cabin_type_{}.json'.format(boat_id, cabin_type_id), 'w') # Path to use in Lightsail 
             f = open('/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Version Control/Final/{}/Requests/request_boat_{}_cabin_type_{}.json'.format(specific_path, boat_id, cabin_type_id), 'w')
             f.write(json.dumps(info_in_json))
             f.close()
             
-            
+            #print('Done')
     
-            update_price_and_availability(boat_id, cabin_type_id, specific_path)
+            update_price_and_availability(boat_id, cabin_type_id, specific_path, GDS_indicator)
            
            
            
            
-    
 
+#update_price_and_availability(31, 240, 'GoldenGalapagos', True)
+#update_price_and_availability(48, 177, 'GAdventures', True)
+#update_price_and_availability(52, 313, 'GoGalapagos', True)
+#update_price_and_availability(35, 71, 'Intrepid', False)
+#update_price_and_availability(88, 425, 'Galagents', False)
+#update_price_and_availability(19, 652, 'Oniric', False)
 
-
-
-
-#update_price_and_availability(31, 240, 'GoldenGalapagos')
-#update_price_and_availability(48, 177, 'GAdventures')
-#update_price_and_availability(52, 313, 'GoGalapagos')
+update_price_and_availability(37, 701, 'Nemo', True)
 
 
 
