@@ -1,0 +1,24 @@
+The only web element that is being scraped are the columns with all the information.
+
+After getting the text info, the specific boat, dates, and availabilities are being processed by text. Here are the separators for each criteria:
+
+	- Boat name:
+		* start: 'span data-v-932536be'
+		* end: '<'
+		* to clean name: '>'
+
+	- Departure date & Arrival date:
+		* start: 'departure col-sm-3'	index to get: 1 & 2
+		* end: '<'						index to get: 0
+		* to clean: '>'					index to get: 1
+		* to clean: '('					index to get: 1
+
+	- Availabilities:
+		* start: 'null'					index to get: 2 & 3
+		* end: '<'						index to get: 0
+		* to clean: '>'					index to get: 1
+
+	- Precio:
+		* start: 'rate col-sm-2'		index to get: 1
+		* end: '<'						index to get: 1
+		* to clean: '>'					index to get: 1
