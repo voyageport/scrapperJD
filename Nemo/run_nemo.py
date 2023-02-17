@@ -20,16 +20,6 @@ sys.path.insert(1, '/Users/juandiegovaca/Desktop/Voyageport/Screen Scraping/Vers
 
 import send_information
 
-"""
-TO DO:
-    1. Revisar que funcione para todos los meses
-    2. Reemplazar 'All Cabins' por el número verdadero
-    
-OBSERVACIONES:
-    * Fechas para Nemo I no coinciden con GDS en 2024
-"""
-
-
 options = webdriver.ChromeOptions()
 options.add_argument('--start-maximized')
 options.add_argument('--disable-extensions')
