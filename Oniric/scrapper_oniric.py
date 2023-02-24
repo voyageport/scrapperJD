@@ -2,15 +2,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from datetime import datetime
-from selenium.common.exceptions import NoSuchElementException
 from data_oniric import COMPLETE_JSON
 
 import time
 import data_oniric
-import string
-import re
-import requests
-import json
 
 def click_on_element_by_path(driver, path):
     time.sleep(5)
@@ -416,18 +411,20 @@ def clean_price(price_old):
     try: 
         price = price_old.split('$')
         price = price[1]
-    
-        price = price.split(',')
-        temp = int(price[0]) * 1000
-        price = price[1].split('.')
-        price = int(price[0])
-        final = temp + price
-        #print(final)
+        if ',' in price:
+            price = price.split(',')
+            temp = int(price[0]) * 1000
+            price = price[1].split('.')
+            price = int(price[0])
+            final = temp + price
+        else:
+            final = int(price.split('.')[0])
+        
         return final
         
     except:
-        print('Falló')
-        return 0
+        print('Failed getting price')
+        return None
         quit()
         
         
